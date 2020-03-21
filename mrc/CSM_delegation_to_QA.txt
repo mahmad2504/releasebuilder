@@ -1,0 +1,76 @@
+From:	McCombe, Kevin
+Sent:	Thursday, January 15, 2015 12:47 PM
+To:	Prosser, Marie
+Subject:	Re: CSM MRC delegation to QA
+
+Hi Marie
+
+Yes, I approve :-)
+
+Thanks
+Kevin
+
+From: <Prosser>, Marie <Marie_Prosser@mentor.com> 
+Date: Thursday, January 15, 2015 at 12:08 PM 
+To: Kevin McCombe <kevin_mccombe@mentor.com> 
+Subject: RE: CSM MRC delegation to QA
+
+Kevin,
+ 
+MRC example attached.  Believe me when I tell you I’m doing you a favor:)
+ 
+Marie
+ 
+From: Prosser, Marie  
+Sent: Thursday, January 15, 2015 11:05 AM 
+To: McCombe, Kevin 
+Subject: RE: CSM MRC delegation to QA
+ 
+Kevin,
+ 
+Minimum Release Checklist (MRC).  This is a release checklist that must be reviewed by General 
+Manager (GM) and Customer Support Manager (CSM). 
+ 
+GM delegated MRC approval to PMMs or Product Owners.
+ 
+CSM (was Dile) delegates MRC approval to Quality Assurance (QA).   If QA approves release, CSM 
+automatically approves MRC.
+ 
+Do you approve as CSM or temporary CSM?
+ 
+Marie 
+ 
+ 
+From: McCombe, Kevin  
+Sent: Thursday, January 15, 2015 10:57 AM 
+To: Prosser, Marie 
+Subject: Re: CSM MRC delegation to QA
+ 
+Hi Marie
+ 
+I’m sorry but there are too many TLAs for me :-)
+ 
+MRC: ?
+CSM: ?
+QA: Quality Assurance
+ 
+Thanks
+Kevin
+ 
+From: <Prosser>, Marie <Marie_Prosser@mentor.com> 
+Date: Thursday, January 15, 2015 at 11:53 AM 
+To: Kevin McCombe <kevin_mccombe@mentor.com> 
+Subject: CSM MRC delegation to QA
+ 
+Kevin,
+ 
+CSM delegates MRC approval to QA.  If QA approves release, CSM automatically approves MRC.
+ 
+Do you approve?
+ 
+ 
+Marie Prosser| QA Engineer & ESD Release Captain
+Mentor Embedded™ |739 N University Blvd, Mobile, AL 36608 USA
+P 251.208.3530
+ 
+ 
