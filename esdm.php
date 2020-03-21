@@ -6,14 +6,19 @@ class ESDM
 		if(!file_exists($release->name))
 			mkdir($release->name);
 	
-		$version_folder = $release->name."/".$release->number."-".$release->version;
+		$version_folder = $release->name."/".$release->number." ".$release->version;
 		
 		if(!file_exists($version_folder))
 			mkdir($version_folder);
 	
 		$esdm_folder = $version_folder."/".$release->number."_esdm";
-		delete_directory($esdm_folder);
-		mkdir($esdm_folder);
+		if(file_exists($esdm_folder))
+		{
+			echo G("Already Generated . Skipping\n");
+			return 1;
+		}
+		//delete_directory($esdm_folder);
+		//mkdir($esdm_folder);
 		$checksumlist = '';
 		$del = '';
 		if(!isset($release->esdm))
@@ -35,6 +40,8 @@ class ESDM
 					exit();
 				}
 			}
+			if(!file_exists($esdm_folder))
+				mkdir($esdm_folder);
 			copy($release->datafolder.'/'.$file, $esdm_folder."/".$file);
 			$checksumlist .= $del.$md5." ".$file;
 			$del="\r\n";

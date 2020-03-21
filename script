@@ -6,8 +6,12 @@ require_once 'esdm.php';
 require_once 'media.php';
 require_once 'mrc.php';
 
-$spreadsheetId = '1K1OHQsonxF5XSU3npZD_Ma1hwJuvQQyWk88scSLF6ZU';
-$sheetname = '20200221- MEL Flex ELM Update-54321 release';		
+$spreadsheetId = getenv('GOOGLE_SPREADSHEET_ID');
+$sheetname = getenv('GOOGLE_SPREADSHEET_NAME');
+
+//'1K1OHQsonxF5XSU3npZD_Ma1hwJuvQQyWk88scSLF6ZU';
+//$sheetname = '20200221- MEL Flex ELM Update-54321 release';	
+//$sheetname = 'Test';		
 		
 $conf = new Configuration();
 $releases = @$conf->Load($spreadsheetId,$sheetname);
@@ -35,36 +39,7 @@ function str_replace_once($str_pattern, $str_replacement, $string)
 
     return $string;
 }
-	  
-function CreateMRC($release)
-{
-	global $mrc_sheet, $mrc_spreadsheet;
-	global $CELL_RELEASE_NUMBER,$CELL_RELEASE_VERSION,$CELL_RELEASE_CAPTAIN,$CELL_RELEASE_DATE;
-	$folder = $release->name."/".$release->number."-".$release->version."/".$release->number."_mrc";
-	delete_directory($folder);
-	mkdir($folder);
-	$mrc_sheet->setCellValue($CELL_RELEASE_NUMBER, $release->number);
-	$mrc_sheet->setCellValue($CELL_RELEASE_VERSION, $release->version);
-	$mrc_sheet->setCellValue($CELL_RELEASE_CAPTAIN, $release->captain);
-	$mrc_sheet->setCellValue($CELL_RELEASE_DATE, $release->fcsDate);
-	
-	
-	$writer = new Xlsx($mrc_spreadsheet);
-	$writer->save($folder.'/mrc_'.$release->number.'.xlsm');
-	
-	$files = glob("mrc/*.*");
-	//var_dump($files);
-    foreach($files as $file)
-	{
-		if($file == 'mrc/mrc_template.xlsm')
-			continue;
-		
-      $file_to_go = str_replace_once('mrc',$folder,$file);
-	  //echo $file."\n";
-	  //echo $file_to_go."\n";
-      copy($file, $file_to_go);
-    }
-}
+
 function delete_directory($dirname) {
 	if (is_dir($dirname))
         $dir_handle = opendir($dirname);

@@ -25,9 +25,17 @@ class MEDIA
 			$files[] = $file;
 		}
 		
-		$media_folder = $release->name."/".$release->number."-".$release->version."/".$release->number."_media";
-		delete_directory($media_folder);
-		mkdir($media_folder);
+		$media_folder = $release->name."/".$release->number." ".$release->version."/".$release->number."_media";
+		if(file_exists($media_folder))
+		{
+			echo G("Already Generated. Skipping\n");
+			return 1;
+		}
+		else
+			mkdir($media_folder);
+		
+		//delete_directory($media_folder);
+		//mkdir($media_folder);
 		$zip = new ZipArchive;
 		
 		$zipfilename = $media_folder."/".$release->mediapn.".zip";

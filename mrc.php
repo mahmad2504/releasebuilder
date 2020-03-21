@@ -33,7 +33,8 @@ class MRC
 	}
 	public function Generate($release)
 	{
-		$folder = $release->name."/".$release->number."-".$release->version."/".$release->number."_mrc";
+		$all_mrc_files = [];
+		$folder = $release->name."/".$release->number." ".$release->version."/".$release->number."_mrc";
 		delete_directory($folder);
 		mkdir($folder);
 		$this->mrc_sheet->setCellValue($this->CELL_RELEASE_NUMBER, $release->number);
@@ -44,9 +45,10 @@ class MRC
 		
 		$writer = new Xlsx($this->mrc_spreadsheet);
 		$writer->save($folder.'/mrc_'.$release->number.'.xlsm');
-		
+		$all_mrc_files[] = $folder.'/mrc_'.$release->number.'.xlsm';
 		$files = glob("mrc/*.*");
 		//var_dump($files);
+		
 		foreach($files as $file)
 		{
 			if($file == 'mrc/mrc_template.xlsm')
@@ -55,8 +57,26 @@ class MRC
 		  $file_to_go = str_replace_once('mrc',$folder,$file);
 		  //echo $file."\n";
 		  //echo $file_to_go."\n";
+		  $all_mrc_files[] = $file_to_go;
 		  copy($file, $file_to_go);
 		}
+		
+		//dump($all_mrc_files);
+		$zip = new ZipArchive;
+		$zipfilename = $release->name."/".$release->number." ".$release->version."/".$release->number."_mrc.zip";
+		@unlink($zipfilename);
+		$retval = $zip->open($zipfilename , ZipArchive::CREATE);
+		
+		if ($retval=== TRUE)
+		{
+			foreach($all_mrc_files as $file)
+			{
+				$zip->addFile($file,basename($file));
+			}
+			$zip->close();
+		}
+		delete_directory($folder);
+		
 		echo G("MRC generated\n");
 	}
 }

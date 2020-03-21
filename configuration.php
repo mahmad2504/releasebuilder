@@ -138,7 +138,8 @@ class Configuration
 		$d[] = new Google_Service_Sheets_ValueRange(
 				[
 					'range' => $sheetname."!"."E3",
-					'values' => [[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],['']]
+					'values' => [[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],
+					[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],[''],['']]
 				]
 			);
 		foreach($releases as $release)
@@ -184,12 +185,20 @@ class Configuration
 			$data = file_get_contents('cache/'.$release->number.".json");
 			$data = json_decode($data);
 			
-			$release->version = str_replace("\\","-",$data->releaseVersion);
+			$release->version = str_replace("\\","-",$data->releaseNameDetails->name);
 			$release->version = str_replace("/","-",$release->version);
+			
+			$release->version = $release->version." [".str_replace("\\","-",$data->releaseVersion)."]";
+			$release->version = str_replace("/","-",$release->version);
+			$release->version = str_replace(":","-",$release->version);
+			echo "[".$release->version."]";
+			
 			$release->mediapn = $data->mediaPartNum;
 			$release->captain = $data->createdByUser->firstName." ".$data->createdByUser->lastName;
 			$release->fcsDate = $data->fcsDate;
 			$release->datafolder = 'data';
+			
+			var_dump($data->releaseNameDetails->name);
 			
 			$rowno = $release->sheetrow+1;
 			$d[] = new Google_Service_Sheets_ValueRange(
