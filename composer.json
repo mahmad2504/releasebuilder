@@ -1,5 +1,7 @@
 {
     "require": {
-        "phpoffice/phpspreadsheet": "^1.11"
+        "phpoffice/phpspreadsheet": "^1.11",
+	 "google/apiclient": "2.0",
+	 "symfony/var-dumper": "5.0"
     }
 }

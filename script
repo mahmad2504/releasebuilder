@@ -1,278 +1,30 @@
 <?php
 require_once 'vendor/autoload.php';
+require_once 'format.php';
+require_once 'Configuration.php';
+require_once 'esdm.php';
+require_once 'media.php';
+require_once 'mrc.php';
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-
-function P5($value)
-{
-	return str_pad($value,5);
-}
-function R($value)
-{
-	return "\e[91m".$value."\e[0m";
-}	
-function Y($value)
-{
-	return "\e[93m".$value."\e[0m";
-}
-function G($value)
-{
-	return "\e[92m".$value."\e[0m";
-}
-function C($value)
-{
-	return "\e[96m".$value."\e[0m";
-}
-function TITLE($value)
-{
-	return "\e[104m".$value."\e[0m";
-}
-
-$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load("release_config.xlsx"); 
-if(@unlink('release_config.xlsx')==false)
-{
-	echo R("Please close release_config.xlsx");
-	exit();
-}
-$writer = new Xlsx($spreadsheet);
-$writer->save('release_config.xlsx');
-
-$data = $spreadsheet->getActiveSheet()->toArray(null,true,true,true); 
-$mrc_spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load("mrc/mrc_template.xlsm"); 
-$mrc_sheet = $mrc_spreadsheet->getActiveSheet();
-$config_sheet = $spreadsheet->getActiveSheet();
-$mrc_data = $mrc_spreadsheet->getActiveSheet()->toArray(null,true,true,true); 
-$CELL_RELEASE_NUMBER='';
-$CELL_RELEASE_VERSION='';
-$CELL_RELEASE_CAPTAIN='';
-$CELL_RELEASE_DATE='';
-for($i=1;$i<=count($mrc_data);$i++)
-{
-	$row =  $mrc_data[$i];	
-	foreach($row as $col=>$value)
-	{
-		if($value == '%RELEASE_NUMBER%')
-			$CELL_RELEASE_NUMBER=$col.$i;
-		else if($value == '%RELEASE_VERSION%')
-			$CELL_RELEASE_VERSION=$col.$i;
-		else if($value == '%RELEASE_CAPTAIN%')
-			$CELL_RELEASE_CAPTAIN=$col.$i;
-		else if($value == '%RELEASE_DATE%')
-			$CELL_RELEASE_DATE=$col.$i;
-			
-	}
-}
-$releases = [];
-$current_release=null;
-$release_name = '';
-for($i=1;$i<=count($data);$i++)
-{
-	$row =  $data[$i];
-	if($i==1)
-	{
-		$release_name = $row['B'];
-		continue;
-	}
-	if($i==2)
-		continue;
-	//var_dump($row);
-	foreach($row as $col=>$value)
-	{
-		if($col == 'A')
-		{
-			if(trim($value)=='')
-				continue;
-			if(!isset($releases[$value]))
-			{
-				if(substr($value, 0, 1 ) === "#")
-				{
-					echo Y("Skipping ").$value."\n";
-					continue;
-				}
-				
-				$releases[$value]=new \StdClass();
-				$releases[$value]->number=$value;
-				$releases[$value]->name = "@".$release_name;
-				$releases[$value]->sheetrow=$i;
-			}
-			$current_release = $releases[$value];
-		}
-		else if($col == 'B')
-		{
-			if(trim($value)=='')
-				continue;
-			
-			$current_release->esdm[]=$value;
-			if(!file_exists('data/'.$value))
-			{
-				echo R('File data/'.$value." Not found\n");
-				exit();
-			}
-		}
+$spreadsheetId = '1K1OHQsonxF5XSU3npZD_Ma1hwJuvQQyWk88scSLF6ZU';
+$sheetname = '20200221- MEL Flex ELM Update-54321 release';		
 		
-		else if($col == 'C')
-		{
-			if(trim($value)=='')
-				continue;
-			$current_release->media[]=$value;
-			if(!file_exists('data/'.$value))
-			{
-				echo R('File data/'.$value." Not found\n");
-				exit();
-			}
-		}
-		
-	}
-}		
-foreach($releases as $release)
-{
-	global $config_sheet,$spreadsheet;
-	if(!file_exists('cache'))
-		mkdir('cache');
-	//echo 'https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number;
-	if(!file_exists('cache/'.$release->number.".json"))
-	{
-		echo G("Checking ".$release->number." on release-api.wv.mentorg.com\n");
-		//echo 'https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number;
-		$data = file_get_contents('https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number);
-		//var_dump($data);
-		if(strlen($data) == 0)
-		{
-			echo R('Release #'.$release->number." does not exist \n");
-			exit();
-		}
-		$data = json_decode($data);
-		if(!isset($data->medias))
-		{
-			 echo R($release->number." Does not have media part number assigned\n");
-			 exit();
-		}
-		if( count($data->medias)==0)
-		{
-			 echo R($release->number." Does not have media part number assigned\n");
-			 exit();
-		}
-		
-		
-		file_put_contents('cache/'.$release->number.".json",json_encode($data));
-		//echo 'Found'."\n";
-	}
-	$data = file_get_contents('cache/'.$release->number.".json");
-	$data = json_decode($data);
-	
-	$release->version = str_replace("\\","-",$data->releaseVersion);
-	$release->version = str_replace("/","-",$release->version);
-	$release->mediapn = $data->medias[0]->mediaPartNum;
-	$release->captain = $data->createdByUser->firstName." ".$data->createdByUser->lastName;
-	$release->fcsDate = $data->fcsDate;
-	
-	$config_sheet->setCellValue('E'.$release->sheetrow, $release->version);
-	
-	$writer = new Xlsx($spreadsheet);
-	$writer->save('release_config.xlsx');
-}
+$conf = new Configuration();
+$releases = @$conf->Load($spreadsheetId,$sheetname);
 
+$mrc = new MRC();
 foreach($releases as $release)
 {
 	echo TITLE("Processing ".$release->number."  ".$release->version."\n");
-	CreateESDM($release);
-	CreateMEDIA($release);
-	CreateMRC($release);
+	ESDM::Generate($release);
+	MEDIA::Generate($release);
+	$mrc->Generate($release);
+	
+	//CreateESDM($release);
+	//CreateMEDIA($release);
+	//CreateMRC($release);
 }
-function CreateESDM($release)
-{
-	if(!file_exists($release->name))
-		mkdir($release->name);
-	
-	if(!file_exists($release->name."/".$release->number."-".$release->version))
-		mkdir($release->name."/".$release->number."-".$release->version);
-	
-	$folder = $release->name."/".$release->number."-".$release->version."/".$release->number."_esdm";
-	delete_directory($folder);
-	mkdir($folder);
-	$checklist = '';
-	$del = '';
-	if(!isset($release->esdm))
-	{
-		echo Y("No ESDM Files\n");
-		return;
-	}
-	foreach($release->esdm as $file)
-	{
-		$md5_file = 'data/'.$file.'.md5';
-		$md5 = md5_file ('data/'.$file);
-		if(file_exists($md5_file))
-		{
-			$cmd5 = file_get_contents('data/'.$md5_file);
-			if($md5 != $cmd5)
-			{
-				echo R($file." Computed MD5 [".$md5."] does not match with [".$cmd5."]");
-				exit();
-			}
-			//ESDM_checklists.txt
-		}
-		copy('data/'.$file, $folder."/".$file);
-		$checklist .= $del.$md5." ".$file;
-		$del="\r\n";
-	}
-	file_put_contents($folder."/ESDM_checksums.txt",$checklist);
-	
-	
-	//var_dump($release);
-	//echo $checklist."\n";
-	
-}
-function CreateMEDIA($release)
-{
-	$files = [];
-	if(!isset($release->media))
-	{
-		echo Y("No MEDIA Files\n");
-		return;
-	}
-	foreach($release->media as $file)
-	{
-		$md5_file = 'data/'.$file.'.md5';
-		$md5 = md5_file ('data/'.$file);
-		if(file_exists($md5_file))
-		{
-			$cmd5 = file_get_contents('data/'.$md5_file);
-			if($md5 != $cmd5)
-			{
-				echo R($file." Computed MD5 [".$md5."] does not match with [".$cmd5."]");
-				exit();
-			}
-		}
-		$files[] = $file;
-	}
-	
-	$media_folder = $release->name."/".$release->number."-".$release->version."/".$release->number."_media";
-	delete_directory($media_folder);
-	mkdir($media_folder);
-	$zip = new ZipArchive;
-	
-	$zipfilename = $media_folder."/".$release->mediapn.".zip";
-	$retval = $zip->open($zipfilename , ZipArchive::CREATE);
-	
-	if ($retval=== TRUE)
-	{
-		foreach($files as $file)
-		{
-			$zip->addFile('data/'.$file,$file);
-		}
-		$zip->close();
-	}
-	else
-	{
-		echo R("zip error ".$retval);
-		exit();
-	}
-	$md5 = md5_file ($zipfilename );
-	$checklist = $md5." ".$release->mediapn.".zip";
-	file_put_contents($media_folder."/Media_checksums.txt",$checklist);
-}
+
 function str_replace_once($str_pattern, $str_replacement, $string)
 {
 
