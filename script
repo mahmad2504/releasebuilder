@@ -4,10 +4,36 @@ require_once 'vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+
+function P5($value)
+{
+	return str_pad($value,5);
+}
+function R($value)
+{
+	return "\e[91m".$value."\e[0m";
+}	
+function Y($value)
+{
+	return "\e[93m".$value."\e[0m";
+}
+function G($value)
+{
+	return "\e[92m".$value."\e[0m";
+}
+function C($value)
+{
+	return "\e[96m".$value."\e[0m";
+}
+function TITLE($value)
+{
+	return "\e[104m".$value."\e[0m";
+}
+
 $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load("release_config.xlsx"); 
 if(@unlink('release_config.xlsx')==false)
 {
-	echo "Please close release_config.xlsx";
+	echo R("Please close release_config.xlsx");
 	exit();
 }
 $writer = new Xlsx($spreadsheet);
@@ -62,7 +88,7 @@ for($i=1;$i<=count($data);$i++)
 			{
 				if(substr($value, 0, 1 ) === "#")
 				{
-					echo "Ignoring ".$value."\n";
+					echo Y("Skipping ").$value."\n";
 					continue;
 				}
 				
@@ -81,7 +107,7 @@ for($i=1;$i<=count($data);$i++)
 			$current_release->esdm[]=$value;
 			if(!file_exists('data/'.$value))
 			{
-				echo 'data/'.$value." Does not exist\n";
+				echo R('File data/'.$value." Not found\n");
 				exit();
 			}
 		}
@@ -93,7 +119,7 @@ for($i=1;$i<=count($data);$i++)
 			$current_release->media[]=$value;
 			if(!file_exists('data/'.$value))
 			{
-				echo 'data/'.$value." Does not exist\n";
+				echo R('File data/'.$value." Not found\n");
 				exit();
 			}
 		}
@@ -108,24 +134,24 @@ foreach($releases as $release)
 	//echo 'https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number;
 	if(!file_exists('cache/'.$release->number.".json"))
 	{
-		echo "Validating ".$release->number."\n";
+		echo G("Checking ".$release->number." on release-api.wv.mentorg.com\n");
 		//echo 'https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number;
 		$data = file_get_contents('https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number);
 		//var_dump($data);
 		if(strlen($data) == 0)
 		{
-			echo $release->number." Does not exist\n";
+			echo R('Release #'.$release->number." does not exist \n");
 			exit();
 		}
 		$data = json_decode($data);
 		if(!isset($data->medias))
 		{
-			 echo $release->number." Does not have media\n";
+			 echo R($release->number." Does not have media part number assigned\n");
 			 exit();
 		}
 		if( count($data->medias)==0)
 		{
-			 echo $release->number." Does not have media\n";
+			 echo R($release->number." Does not have media part number assigned\n");
 			 exit();
 		}
 		
@@ -150,7 +176,7 @@ foreach($releases as $release)
 
 foreach($releases as $release)
 {
-	echo "Processing ".$release->number."  ".$release->version."\n";
+	echo TITLE("Processing ".$release->number."  ".$release->version."\n");
 	CreateESDM($release);
 	CreateMEDIA($release);
 	CreateMRC($release);
@@ -170,7 +196,7 @@ function CreateESDM($release)
 	$del = '';
 	if(!isset($release->esdm))
 	{
-		echo "No ESDM Files\n";
+		echo Y("No ESDM Files\n");
 		return;
 	}
 	foreach($release->esdm as $file)
@@ -182,7 +208,7 @@ function CreateESDM($release)
 			$cmd5 = file_get_contents('data/'.$md5_file);
 			if($md5 != $cmd5)
 			{
-				echo $file." Computed MD5 [".$md5."] does not match with [".$cmd5."]";
+				echo R($file." Computed MD5 [".$md5."] does not match with [".$cmd5."]");
 				exit();
 			}
 			//ESDM_checklists.txt
@@ -203,7 +229,7 @@ function CreateMEDIA($release)
 	$files = [];
 	if(!isset($release->media))
 	{
-		echo "No MEDIA Files\n";
+		echo Y("No MEDIA Files\n");
 		return;
 	}
 	foreach($release->media as $file)
@@ -215,7 +241,7 @@ function CreateMEDIA($release)
 			$cmd5 = file_get_contents('data/'.$md5_file);
 			if($md5 != $cmd5)
 			{
-				echo $file." Computed MD5 [".$md5."] does not match with [".$cmd5."]";
+				echo R($file." Computed MD5 [".$md5."] does not match with [".$cmd5."]");
 				exit();
 			}
 		}
@@ -240,7 +266,7 @@ function CreateMEDIA($release)
 	}
 	else
 	{
-		echo "zip error ".$retval;
+		echo R("zip error ".$retval);
 		exit();
 	}
 	$md5 = md5_file ($zipfilename );
