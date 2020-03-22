@@ -160,7 +160,7 @@ class Configuration
 				}
 				$data = json_decode($data);
 				//dump($data->softwareFileDelivery[0]);
-				echo count($data->softwareFileDelivery);
+				//echo count($data->softwareFileDelivery);
 				
 				if(isset($data->softwareFileDelivery))
 					if( count($data->softwareFileDelivery)>0)
@@ -191,14 +191,14 @@ class Configuration
 			$release->version = $release->version." [".str_replace("\\","-",$data->releaseVersion)."]";
 			$release->version = str_replace("/","-",$release->version);
 			$release->version = str_replace(":","-",$release->version);
-			echo "[".$release->version."]";
+			//echo "[".$release->version."]";
 			
 			$release->mediapn = $data->mediaPartNum;
 			$release->captain = $data->createdByUser->firstName." ".$data->createdByUser->lastName;
 			$release->fcsDate = $data->fcsDate;
 			$release->datafolder = 'data';
 			
-			var_dump($data->releaseNameDetails->name);
+			//var_dump($data->releaseNameDetails->name);
 			
 			$rowno = $release->sheetrow+1;
 			$d[] = new Google_Service_Sheets_ValueRange(
