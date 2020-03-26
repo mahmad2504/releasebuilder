@@ -13,8 +13,8 @@ class Emailer
 		$this->mail->SMTPAuth = false;
 		$this->mail->SMTPAutoTLS = false; 
 		$this->mail->Port = 25; 
-		$this->mail->Username   = 'mahmad@something.com'; 
-		$this->mail->setFrom('mahmad@something.com', 'Release Bot');
+		$this->mail->Username   = 'release-bot@mentorg.com'; 
+		$this->mail->setFrom('release-bot@mentorg.com', 'Release Bot');
 	}
 	function SendMRCApprovalEmail($releases,$zipfile)
 	{
