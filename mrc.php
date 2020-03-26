@@ -37,6 +37,11 @@ class MRC
 		$folder = $release->name."/".$release->number." ".$release->version."/".$release->number."_mrc";
 		delete_directory($folder);
 		mkdir($folder);
+		
+		$mrc_folder = $release->name."/mrc";
+		if(!file_exists($mrc_folder))
+			mkdir($mrc_folder);
+		
 		$this->mrc_sheet->setCellValue($this->CELL_RELEASE_NUMBER, $release->number);
 		$this->mrc_sheet->setCellValue($this->CELL_RELEASE_VERSION, $release->version);
 		$this->mrc_sheet->setCellValue($this->CELL_RELEASE_CAPTAIN, $release->captain);
@@ -48,7 +53,10 @@ class MRC
 		$all_mrc_files[] = $folder.'/mrc_'.$release->number.'.xlsm';
 		$files = glob("mrc/*.*");
 		//var_dump($files);
-		
+		foreach($all_mrc_files as $file)
+		{
+			copy($file,$mrc_folder."/".basename($file));
+		}
 		foreach($files as $file)
 		{
 			if($file == 'mrc/mrc_template.xlsm')
@@ -59,6 +67,7 @@ class MRC
 		  //echo $file_to_go."\n";
 		  $all_mrc_files[] = $file_to_go;
 		  copy($file, $file_to_go);
+		  
 		}
 		
 		//dump($all_mrc_files);
@@ -74,6 +83,7 @@ class MRC
 				$zip->addFile($file,basename($file));
 			}
 			$zip->close();
+			copy($zipfilename,$mrc_folder."/".basename($zipfilename));
 		}
 		delete_directory($folder);
 		
