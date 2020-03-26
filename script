@@ -33,6 +33,10 @@ $mrc = new MRC();
 foreach($releases as $release)
 {
 	echo TITLE("Processing ".$release->number."  ".$release->version."\n");
+	if($release->status == 'RC Approved')
+		echo G("STATUS ".$release->status."\n");
+	else
+		echo Y("STATUS ".$release->status."\n");
 	ESDM::Generate($release);
 	MEDIA::Generate($release);
 	$mrc->Generate($release);

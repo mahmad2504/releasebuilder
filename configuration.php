@@ -159,6 +159,8 @@ class Configuration
 					exit();
 				}
 				$data = json_decode($data);
+				
+				
 				//dump($data->softwareFileDelivery[0]);
 				//echo count($data->softwareFileDelivery);
 				
@@ -185,6 +187,7 @@ class Configuration
 			$data = file_get_contents('cache/'.$release->number.".json");
 			$data = json_decode($data);
 			
+			$release->status=$data->status;
 			$release->version = str_replace("\\","-",$data->releaseNameDetails->name);
 			$release->version = str_replace("/","-",$release->version);
 			
