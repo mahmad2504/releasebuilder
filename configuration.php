@@ -3,13 +3,15 @@ require_once 'vendor/autoload.php';
 
 class Configuration
 {
-	function __construct()
+	private $cache;
+	function __construct($cache=1)
 	{
 		if (php_sapi_name() != 'cli') 
 		{
 			echo R("This application must be run on the command line");
 			exit();
 		}
+		$this->cache=$cache;
 	}
 	private function getClient()
 	{
@@ -147,7 +149,7 @@ class Configuration
 			if(!file_exists('cache'))
 				mkdir('cache');
 			//echo 'https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number;
-			if(!file_exists('cache/'.$release->number.".json"))
+			if(!file_exists('cache/'.$release->number.".json")||$this->cache==0)
 			{
 				echo G("Checking ".$release->number." on release-api.wv.mentorg.com\n");
 				//echo 'https://release-api.wv.mentorg.com/release-api/release_detail/number/'.$release->number;

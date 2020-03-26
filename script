@@ -22,11 +22,25 @@ $CliArgs = new CliArgs(
 [
 	'email' => [
 		'default' => 0,
+	],
+	'cache' => [
+		'default' => 1,
+	],
+	'help' => [
+		'default' => 0,
 	]
 ]);
 
-		
-$conf = new Configuration();
+$help=$CliArgs->getArg('help');
+if($help == 1)
+{
+	echo "run --email=1  sends mrc email\n";
+	echo "run --cache=0  refetch release details\n";
+	echo "run --help=1   prints help\n";
+	exit();
+}
+	
+$conf = new Configuration($CliArgs->getArg('cache'));
 $releases = @$conf->Load($spreadsheetId,$sheetname);
 
 $mrc = new MRC();
@@ -35,6 +49,8 @@ foreach($releases as $release)
 	echo TITLE("Processing ".$release->number."  ".$release->version."\n");
 	if($release->status == 'RC Approved')
 		echo G("STATUS ".$release->status."\n");
+	else if($release->status == 'Registered')
+		echo C("STATUS ".$release->status."\n");
 	else
 		echo Y("STATUS ".$release->status."\n");
 	ESDM::Generate($release);
