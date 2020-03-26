@@ -53,9 +53,19 @@ class MRC
 		$all_mrc_files[] = $folder.'/mrc_'.$release->number.'.xlsm';
 		$files = glob("mrc/*.*");
 		//var_dump($files);
-		foreach($all_mrc_files as $file)
+		$zip = new ZipArchive;
+		$zipfilename = $release->name."/mrc/all_mrc.zip";
+		//unlink($zipfilename);
+		//@unlink($zipfilename);
+		$retval = $zip->open($zipfilename , ZipArchive::CREATE);
+		if ($retval=== TRUE)
 		{
-			copy($file,$mrc_folder."/".basename($file));
+			foreach($all_mrc_files as $file)
+			{
+				$zip->addFile($file,basename($file));
+				//copy($file,$mrc_folder."/".basename($file));
+			}
+			$zip->close();
 		}
 		foreach($files as $file)
 		{

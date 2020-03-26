@@ -1,7 +1,9 @@
 {
     "require": {
         "phpoffice/phpspreadsheet": "^1.11",
-	 "google/apiclient": "2.0",
-	 "symfony/var-dumper": "5.0"
+		"google/apiclient": "2.0",
+		"symfony/var-dumper": "5.0",
+        "phpmailer/phpmailer": "^6.1",
+		"cheprasov/php-cli-args":"3.0.0"
     }
 }

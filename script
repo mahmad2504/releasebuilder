@@ -5,6 +5,10 @@ require_once 'Configuration.php';
 require_once 'esdm.php';
 require_once 'media.php';
 require_once 'mrc.php';
+require_once 'emailer.php';
+
+
+use CliArgs\CliArgs;
 
 $spreadsheetId = getenv('GOOGLE_SPREADSHEET_ID');
 $sheetname = getenv('GOOGLE_SPREADSHEET_NAME');
@@ -12,6 +16,15 @@ $sheetname = getenv('GOOGLE_SPREADSHEET_NAME');
 //'1K1OHQsonxF5XSU3npZD_Ma1hwJuvQQyWk88scSLF6ZU';
 //$sheetname = '20200221- MEL Flex ELM Update-54321 release';	
 //$sheetname = 'Test';		
+
+
+$CliArgs = new CliArgs(
+[
+	'email' => [
+		'default' => 0,
+	]
+]);
+
 		
 $conf = new Configuration();
 $releases = @$conf->Load($spreadsheetId,$sheetname);
@@ -28,6 +41,13 @@ foreach($releases as $release)
 	//CreateMEDIA($release);
 	//CreateMRC($release);
 }
+echo $CliArgs->getArg('email');
+if($CliArgs->getArg('email') == '1')
+{
+	$emailer = new Emailer();
+	$emailer->SendMRCApprovalEmail($releases,$release->name.'/mrc/all_mrc.zip');
+}
+
 
 function str_replace_once($str_pattern, $str_replacement, $string)
 {
