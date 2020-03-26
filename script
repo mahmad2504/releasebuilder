@@ -41,7 +41,6 @@ foreach($releases as $release)
 	//CreateMEDIA($release);
 	//CreateMRC($release);
 }
-echo $CliArgs->getArg('email');
 if($CliArgs->getArg('email') == '1')
 {
 	$emailer = new Emailer();

@@ -15,7 +15,7 @@ class MEDIA
 			$md5 = md5_file ($release->datafolder.'/'.$file);
 			if(file_exists($md5_file))
 			{
-				$cmd5 = file_get_contents($release->datafolder.'/'.$md5_file);
+				$cmd5 = explode(' ',file_get_contents($md5_file))[0];
 				if($md5 != $cmd5)
 				{
 					echo R($file." Computed MD5 [".$md5."] does not match with [".$cmd5."]");
