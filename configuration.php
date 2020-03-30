@@ -21,6 +21,7 @@ class Configuration
 		$client->setScopes(Google_Service_Sheets::SPREADSHEETS);
 		$client->setAuthConfig('credentials.json');
 		$client->setAccessType('offline');
+		$client->setApprovalPrompt('force');
 		$client->setPrompt('select_account consent');
 
 		// Load previously authorized token from a file, if it exists.
